@@ -5,11 +5,15 @@ This example shows how to create a simple applet in Bokeh, which can
 be viewed directly on a bokeh-server.
 
 
-![screen shot](https://github.com/brianray/bokeh_roc_slider/blob/master/screenshot.png "Screenshot")
 
 
 Running
 =======
+
+Standalone
+``````````
+
+![screen shot](https://github.com/brianray/bokeh_roc_slider/blob/master/screenshot.png "Screenshot")
 
 To view this applet directly from a bokeh server, you simply need to
 run a bokeh-server and point it at the stock example script:
@@ -19,3 +23,14 @@ run a bokeh-server and point it at the stock example script:
 Now navigate to the following URL in a browser:
 
     http://localhost:5006/bokeh/roc_slider
+
+
+In Jupyter (ipython) notebook
+`````````````````````````````
+
+![screen shot](https://github.com/brianray/bokeh_roc_slider/blob/master/screenshot_notebook.png "Screenshot")
+
+* [a Notebook with Demo data](bokeh_roc_slider_embed.ipynb)
+* [a Notebook with your data](bokeh_roc_slider_embed_data.ipynb)
+
+

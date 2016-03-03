@@ -253,7 +253,13 @@ class RocPlotNotebook(object):
             self.app.sample_size.value = kwargs.get('sample_size')
             self.app.auc.value = kwargs.get('auc')
             self.app.update_data()
-        self.app.source.push_notebook()
+            self.app.source.push_notebook()
+        else:
+            # just handle updates to threshold
+            x, y = self.app.get_collide()
+            self.app.point_source.data = dict(x=[x], y=[y])
+            self.app.conf_source.data = self.app.conf_matrix()
+        # always update point and confusion matrix
         self.app.point_source.push_notebook()
         self.app.conf_source.push_notebook()
         
