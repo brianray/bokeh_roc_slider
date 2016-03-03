@@ -252,8 +252,10 @@ class RocPlotNotebook(object):
         if self.demo:
             self.app.sample_size.value = kwargs.get('sample_size')
             self.app.auc.value = kwargs.get('auc')
-        self.app.update_data()
+            self.app.update_data()
         self.app.source.push_notebook()
+        self.app.point_source.push_notebook()
+        self.app.conf_source.push_notebook()
         
     def interact_widgets(self, args=None):
         ''' shows widgets in Jupyter notebook'''
@@ -265,7 +267,7 @@ class RocPlotNotebook(object):
         if self.demo:
             args['auc'] = widgets.FloatSlider(min=0.0, max=100.0, step=0.1, value=70.0)
             args['sample_size'] = widgets.IntSlider(min=0, max=800, step=2, value=400)
-        widgets.interact_callback(self.interact, **args)
+        widgets.interact(self.interact_callback, **args)
     
     
         
