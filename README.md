@@ -4,7 +4,7 @@ Receiver operating characteristic chart in Bokeh
 This example shows how to create a simple applet in Bokeh, which can
 be viewed directly on a bokeh-server.
 
-
+Authors: [Brian Ray](mailto:brianhray@gmail.com?subject=boc_roc_slider) @brianray
 
 
 ##Running
@@ -22,12 +22,11 @@ Now navigate to the following URL in a browser:
 
     http://localhost:5006/bokeh/roc_slider
 
-
 ###In Jupyter (ipython) notebook
 
 ![screen shot](https://github.com/brianray/bokeh_roc_slider/blob/master/screenshot_notebook.png "Screenshot")
 
-* [a Notebook with Demo data](bokeh_roc_slider_embed.ipynb)
-* [a Notebook with your data](bokeh_roc_slider_embed_data.ipynb)
+* [Jupyter Notebook with Demo data](bokeh_roc_slider_embed.ipynb)
+* [Jupyter Notebook with your data](bokeh_roc_slider_embed_data.ipynb)
 
 
