@@ -5,7 +5,7 @@ This example shows how to create a simple applet in Bokeh, which can
 be viewed directly on a bokeh-server.
 
 
-![screen shot](https://github.com/brianray/bokeh_roc_slider/screenshot.png "Screenshot")
+![screen shot](https://github.com/brianray/bokeh_roc_slider/blob/master/screenshot.png "Screenshot")
 
 
 Running
