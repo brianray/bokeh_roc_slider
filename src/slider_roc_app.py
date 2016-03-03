@@ -25,7 +25,7 @@ import copy
 import numpy as np
 from pyroc import random_mixture_model, ROCData
 
-from bokeh.plotting import figure
+from bokeh.plotting import figure, show, output_notebook
 from bokeh.models import Plot, ColumnDataSource
 from bokeh.properties import Instance
 from bokeh.server.app import bokeh_app
@@ -56,10 +56,10 @@ def random_roc_data(auc=.7, std_dev=.2, size=300):
     return dict(x=roc_x, y=roc_y)
 
 
-class SlidersApp(HBox):
+class RocPlot(HBox):
     """An example of a browser-based, interactive plot with slider controls."""
 
-    extra_generated_classes = [["SlidersApp", "SlidersApp", "HBox"]]
+    extra_generated_classes = [["RocPlot", "RocPlot", "HBox"]]
 
     inputs = Instance(VBoxForm)
 
@@ -102,7 +102,9 @@ class SlidersApp(HBox):
             title="Area Under Curve (AUC)", name='auc',
             value=70.0, start=0.0, end=100.0, step=0.1
         )
-
+        
+        #        threshold=widgets.FloatSliderWidget(min=0.0, max=100.0, step=0.1, value=50.0),
+        #        auc=widgets.FloatSliderWidget(min=0.0, max=100.0, step=0.1, value=0.0))
         toolset = "crosshair,pan,reset,resize,save,wheel_zoom"
 
         # Generate a figure container
@@ -170,7 +172,7 @@ class SlidersApp(HBox):
 
         The callback is set to the input_change method of this app.
         """
-        super(SlidersApp, self).setup_events()
+        super(RocPlot, self).setup_events()
         if not self.text:
             return
 
@@ -228,6 +230,45 @@ class SlidersApp(HBox):
         self.conf_source.data = self.conf_matrix()
 
 
+class RocPlotNotebook(object):
+    ''' proxy for RocPlot for embeding in Jupyter notebooks '''
+
+
+    def __init__(self, data=None, args=None):  
+        ''' if no `data` provided, will run in demo mode'''
+        output_notebook()
+        roc_obj = RocPlot()
+        self.demo = True
+        if data:
+            roc_obj.source = ColumnDataSource(data=data)
+            self.demo = False
+        self.app = roc_obj.create()
+        show(self.app.plot)
+
+
+    def interact_callback(self, **kwargs): #sample_size, threshold, auc):
+        ''' callback from interact_widgets '''
+        self.app.threshold.value = kwargs.get('threshold')  
+        if self.demo:
+            self.app.sample_size.value = kwargs.get('sample_size')
+            self.app.auc.value = kwargs.get('auc')
+        self.app.update_data()
+        self.app.source.push_notebook()
+        
+    def interact_widgets(self, args=None):
+        ''' shows widgets in Jupyter notebook'''
+        import warnings
+        warnings.simplefilter(action = "ignore", category = FutureWarning)
+        from IPython.html import widgets
+        if not args:
+            args = dict(threshold=widgets.FloatSlider(min=0.0, max=100.0, step=0.1, value=50.0))
+        if self.demo:
+            args['auc'] = widgets.FloatSlider(min=0.0, max=100.0, step=0.1, value=70.0)
+            args['sample_size'] = widgets.IntSlider(min=0, max=800, step=2, value=400)
+        widgets.interact_callback(self.interact, **args)
+    
+    
+        
 # The following code adds a "/bokeh/roc_slider/" url to the bokeh-server. This
 # URL will render this sine wave sliders app. If you don't want to serve this
 # applet from a Bokeh server (for instance if you are embedding in a separate
@@ -235,5 +276,5 @@ class SlidersApp(HBox):
 @bokeh_app.route("/bokeh/roc_slider/")
 @object_page("sin")
 def make_sliders():
-    app = SlidersApp.create()
+    app = RocPlot.create()
     return app
