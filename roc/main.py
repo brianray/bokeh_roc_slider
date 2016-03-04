@@ -15,7 +15,7 @@ Author: Brian Ray <brianhray@gmail.com>
 
 """
 
-# this will not be needed in Bokeh 0.12
+# this will not be needed in 0.12
 from os.path import dirname
 import sys
 sys.path.insert(0, dirname(__file__))
@@ -74,8 +74,7 @@ def input_change(attr, old, new):
     It is responsible for updating the plot, or anything else you want.
 
     Args:
-        obj : the object that changed
-        attrname : the attr that changed
+        attr : the name of the attr that changed
         old : old value of attr
         new : new value of attr
     """
@@ -100,15 +99,9 @@ def update_data():
 source = ColumnDataSource(data=random_roc_data(size=200))
 
 text = TextInput(title="title", name='title', value='ROC Curve')
-
-sample_size = Slider(title="Sample Size (splits 50/50)", name='threshold',
-                     value=400, start=50, end=800, step=2)
-
-threshold = Slider(title="Threshold", name='threshold',
-                   value=50.0, start=0.0, end=100.0, step=0.1)
-
-auc = Slider(title="Area Under Curve (AUC)", name='auc',
-             value=70.0, start=0.0, end=100.0, step=0.1)
+sample_size = Slider(title="Sample Size (splits 50/50)", value=400, start=50, end=800, step=2)
+threshold = Slider(title="Threshold", value=50.0, start=0.0, end=100.0, step=0.1)
+auc = Slider(title="Area Under Curve (AUC)", value=70.0, start=0.0, end=100.0, step=0.1)
 
 # Generate a figure container
 plot = Figure(title_text_font_size="12pt",
@@ -132,35 +125,29 @@ plot.circle_cross('x', 'y', source=point_source, color="blue")
 
 conf_source = ColumnDataSource(data=conf_matrix())
 
-text_props = {"source": conf_source,
-              "angle": 0,
-              "text_font": "Courier",
-              "text_font_size": "8pt",
-              "color": "grey",
+text_props = {"text_font": "Courier",
               "text_align": "left",
               "text_baseline": "middle"}
 
-label_props = dict(text_props)
-del label_props['source']
-label_props['text_font_size'] = "5pt"
-
 # the confusion matrix
-plot.text(x=0.825, y=0.21, text=["True"], **label_props)
-plot.text(x=0.925, y=0.21, text=["False"], **label_props)
-plot.text(x=0.825, y=0.15, text="TP", **text_props)
-plot.text(x=0.925, y=0.15, text="FP", **text_props)
-plot.text(x=0.725, y=0.15, text=["True"], **label_props)
-plot.text(x=0.725, y=0.05, text=["False"], **label_props)
-plot.text(x=0.825, y=0.05, text="FN", **text_props)
-plot.text(x=0.925, y=0.05, text="TN", **text_props)
+text_props['text_font_size'] = "5pt"
+plot.text(x=0.825, y=0.21, text=["True"], **text_props)
+plot.text(x=0.925, y=0.21, text=["False"], **text_props)
+plot.text(x=0.725, y=0.15, text=["True"], **text_props)
+plot.text(x=0.725, y=0.05, text=["False"], **text_props)
+
+text_props['text_font_size'] = "8pt"
+plot.text(x=0.825, y=0.15, text="TP", source=conf_source, **text_props)
+plot.text(x=0.925, y=0.15, text="FP", source=conf_source, **text_props)
+plot.text(x=0.825, y=0.05, text="FN", source=conf_source, **text_props)
+plot.text(x=0.925, y=0.05, text="TN", source=conf_source, **text_props)
 
 update_data()
 
 text.on_change('value', input_change)
-
 for w in [threshold, text, auc, sample_size]:
     w.on_change('value', input_change)
 
-inputs = VBoxForm(children=[text, sample_size, threshold, auc])
+inputs = VBoxForm(text, sample_size, threshold, auc)
 
-curdoc().add_root(HBox(children=[inputs, plot], width=800))
+curdoc().add_root(HBox(inputs, plot, width=800))
