@@ -15,20 +15,16 @@ Author: Brian Ray <brianhray@gmail.com>
 
 """
 
-# this will not be needed in 0.12
+# this will not be needed in Bokeh 0.12
 from os.path import dirname
 import sys
 sys.path.insert(0, dirname(__file__))
-
-import logging
-logging.basicConfig(level=logging.DEBUG)
 
 from pyroc import random_mixture_model, ROCData
 
 from bokeh.io import curdoc
 from bokeh.plotting.figure import Figure
-from bokeh.models import ColumnDataSource
-from bokeh.models.widgets import HBox, Slider, TextInput, VBoxForm
+from bokeh.models import ColumnDataSource, HBox, Slider, TextInput, VBoxForm
 
 CACHED_DATA = {}
 
@@ -65,7 +61,7 @@ def conf_matrix():
     N = len(source.data['y'])
     TPR = point_source.data['y'][0]  # y axis sensitivity
     TNR = point_source.data['x'][0]  # x axis specificity
-    TP = TPR * P  # True Possitive
+    TP = TPR * P  # True Positive
     TN = TNR * N  # True Negative
     FP = P - TP
     FN = N - TN
@@ -114,13 +110,11 @@ threshold = Slider(title="Threshold", name='threshold',
 auc = Slider(title="Area Under Curve (AUC)", name='auc',
              value=70.0, start=0.0, end=100.0, step=0.1)
 
-TOOLS = "crosshair,pan,reset,resize,save,wheel_zoom"
-
 # Generate a figure container
 plot = Figure(title_text_font_size="12pt",
               plot_height=400,
               plot_width=400,
-              tools=TOOLS,
+              tools="crosshair,pan,reset,resize,save,wheel_zoom",
               title=text.value,
               x_range=[0, 1],
               y_range=[0, 1])
