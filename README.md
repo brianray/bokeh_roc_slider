@@ -13,7 +13,7 @@ Authors: [Brian Ray](mailto:brianhray@gmail.com?subject=boc_roc_slider) @brianra
 
 ![screen shot](https://github.com/brianray/bokeh_roc_slider/blob/master/screenshot.png "Screenshot")
 
-To view this app directly from a bokeh server using Bokeh > 0.11,
+To view this app directly from a bokeh server using Bokeh >= 0.11,
 run the `bokeh serve` command and point it at the stock example directory:
 
     bokeh serve --show roc
