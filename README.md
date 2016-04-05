@@ -13,14 +13,14 @@ Authors: [Brian Ray](mailto:brianhray@gmail.com?subject=boc_roc_slider) @brianra
 
 ![screen shot](https://github.com/brianray/bokeh_roc_slider/blob/master/screenshot.png "Screenshot")
 
-To view this applet directly from a bokeh server, you simply need to
-run a bokeh-server and point it at the stock example script:
+To view this app directly from a bokeh server using Bokeh >= 0.11,
+run the `bokeh serve` command and point it at the stock example directory:
 
-    bokeh-server --script src/slider_roc_app.py
+    bokeh serve --show roc
 
-Now navigate to the following URL in a browser:
+A browser tab should open automatically to the following URL:
 
-    http://localhost:5006/bokeh/roc_slider
+    http://localhost:5006/roc
 
 ###In Jupyter (ipython) notebook
 
@@ -28,5 +28,3 @@ Now navigate to the following URL in a browser:
 
 * [Jupyter Notebook with Demo data](bokeh_roc_slider_embed.ipynb)
 * [Jupyter Notebook with your data](bokeh_roc_slider_embed_data.ipynb)
-
-
