@@ -72,8 +72,8 @@ def get_collide():
 
 def conf_matrix():
     """Calculate the confusion Matrix"""
-    P = len(source.data['x'])
-    N = len(source.data['y'])
+    P = len(source.data['x']) / 2.0
+    N = len(source.data['y']) / 2.0
     TPR = point_source.data['y'][0]  # y axis sensitivity
     TNR = point_source.data['x'][0]  # x axis specificity
     TP = TPR * P  # True Positive
