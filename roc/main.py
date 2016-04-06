@@ -11,7 +11,8 @@ AUC (Area Under the Curve). The threshold may be set, and the
 impact of the resultant confustion matrix will display in the
 lower right corner.
 
-Author: Brian Ray <brianhray@gmail.com>
+Author(s): Brian Ray <brianhray@gmail.com>, 
+           Bryan Van de Ven <bryanv@continuum.io>
 
 """
 
@@ -20,11 +21,25 @@ from os.path import dirname
 import sys
 sys.path.insert(0, dirname(__file__))
 
+import logging
+
 from pyroc import random_mixture_model, ROCData
 
 from bokeh.io import curdoc
 from bokeh.plotting.figure import Figure
-from bokeh.models import ColumnDataSource, HBox, Slider, TextInput, VBoxForm
+from bokeh.models import (ColumnDataSource,
+                          HBox,
+                          Slider,
+                          TextInput,
+                          VBoxForm,
+                          CustomJS)
+
+HAS_REQUESTS = False
+try:
+    import requests
+    HAS_REQUESTS = True
+except:
+    logging.warn("install 'requests' package for json fetching")
 
 CACHED_DATA = {}
 
@@ -81,6 +96,19 @@ def input_change(attr, old, new):
     update_data()
     plot.title = text.value
 
+source_url = ColumnDataSource()
+
+def dataurl_change(attr, old, new):
+    if new != "DEMO":
+        try:
+            source_url.data = requests.get(new).json()
+            inputs = VBoxForm(text, threshold, dataurl)
+            curdoc().remove_root(plot)
+            curdoc().add_root(HBox(inputs, plot, width=800))
+        except:
+            logging.warn("unable to fetch {}".format(new))
+    update_data()
+
 
 def update_data():
     """Called each time that any watched property changes.
@@ -90,7 +118,12 @@ def update_data():
     data source property.
     """
     size = int(sample_size.value) / 2
-    source.data = random_roc_data(auc=float(auc.value)/100.0, size=size)
+    if source_url.data == {}:
+        source.data = random_roc_data(auc=float(auc.value)/100.0, size=size)
+    else:
+        source.data = source_url.data
+        for w in [threshold, text, auc, sample_size]:
+            w.disabled = True
     x, y = get_collide()
     point_source.data = dict(x=[x], y=[y])
     conf_source.data = conf_matrix()
@@ -102,6 +135,7 @@ text = TextInput(title="title", name='title', value='ROC Curve')
 sample_size = Slider(title="Sample Size (splits 50/50)", value=400, start=50, end=800, step=2)
 threshold = Slider(title="Threshold", value=50.0, start=0.0, end=100.0, step=0.1)
 auc = Slider(title="Area Under Curve (AUC)", value=70.0, start=0.0, end=100.0, step=0.1)
+dataurl = TextInput(title="Data Url", name='data', value='DEMO')
 
 # Generate a figure container
 plot = Figure(title_text_font_size="12pt",
@@ -145,9 +179,24 @@ plot.text(x=0.925, y=0.05, text="TN", source=conf_source, **text_props)
 update_data()
 
 text.on_change('value', input_change)
-for w in [threshold, text, auc, sample_size]:
+dataurl.on_change('value', dataurl_change)
+
+# There must be a better way:
+dataurl.callback = CustomJS(args=dict(auc=auc,
+                                      sample_size=sample_size),
+                            code="""
+         // $("label[for='"+auc.id+"']").parentNode.remove();
+         document.getElementById(auc.id).parentNode.hidden = true;
+         // $("label[for='"+sample_size.id+"']").parentNode.remove();
+         document.getElementById(sample_size.id).parentNode.hidden = true;
+    """)
+
+for w in (threshold, text, auc, sample_size):
     w.on_change('value', input_change)
 
-inputs = VBoxForm(text, sample_size, threshold, auc)
+vbox_items = [text, sample_size, threshold, auc]
+if HAS_REQUESTS:
+    vbox_items.append(dataurl)
+inputs = VBoxForm(*vbox_items)
 
 curdoc().add_root(HBox(inputs, plot, width=800))
